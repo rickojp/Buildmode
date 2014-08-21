@@ -50,6 +50,7 @@ namespace BuildMode
 		public override void Initialize()
 		{
 			Commands.ChatCommands.Add(new Command("buildmode", BuildModeCmd, "buildmode"));
+            Commands.ChatCommands.Add(new Command("buildmode.check", BMCheck, "bmcheck"));
 
 			ServerApi.Hooks.NetGetData.Register(this, OnGetData);
 			ServerApi.Hooks.NetSendBytes.Register(this, OnSendBytes);
@@ -264,5 +265,29 @@ namespace BuildMode
 					e.Player.SendData(PacketTypes.ProjectileNew, "", i);
 			}
 		}
+
+        void BMCheck(CommandArgs args)
+        {
+            var plStr = String.Join(" ", args.Parameters);
+
+            var ply = TShock.Utils.FindPlayer(plStr);
+            if (ply.Count < 1)
+            {
+                args.Player.SendErrorMessage("No players matched that name!");
+            }
+            else if (ply.Count > 1)
+            {
+                args.Player.SendErrorMessage("More than one player has that name!");
+            }
+            else
+            {
+                if (Build[ply[0].Index])
+                {
+                    args.Player.SendInfoMessage(ply[0].Name + " has Buildmode enabled!");
+                }
+                else
+                    args.Player.SendInfoMessage(ply[0].Name + " does not have Buildmode enabled.");
+            }
+        }
 	}
 }
