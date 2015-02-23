@@ -49,7 +49,7 @@ namespace BuildMode
 		}
 		public override void Initialize()
 		{
-			Commands.ChatCommands.Add(new Command("buildmode", BuildModeCmd, "buildmode"));
+			Commands.ChatCommands.Add(new Command("buildmode.use", BuildModeCmd, "buildmode"));
             Commands.ChatCommands.Add(new Command("buildmode.check", BMCheck, "bmcheck"));
 
 			ServerApi.Hooks.NetGetData.Register(this, OnGetData);
