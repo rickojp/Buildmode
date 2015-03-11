@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Timers;
 using Terraria;
@@ -8,7 +9,7 @@ using TShockAPI;
 
 namespace BuildMode
 {
-	[ApiVersion(1, 16)]
+	[ApiVersion(1, 17)]
 	public class BuildMode : TerrariaPlugin
 	{
 		public override string Author
@@ -66,7 +67,6 @@ namespace BuildMode
 			{
 				if (Build[i])
 				{
-
 					Player plr = Main.player[i];
 					TSPlayer tsplr = TShock.Players[i];
 
@@ -277,7 +277,7 @@ namespace BuildMode
             }
             else if (ply.Count > 1)
             {
-                args.Player.SendErrorMessage("More than one player has that name!");
+                TShock.Utils.SendMultipleMatchError(args.Player, ply.Select(p => p.Name));
             }
             else
             {
