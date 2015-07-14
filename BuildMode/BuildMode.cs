@@ -9,7 +9,7 @@ using TShockAPI;
 
 namespace BuildMode
 {
-	[ApiVersion(1, 17)]
+	[ApiVersion(1, 19)]
 	public class BuildMode : TerrariaPlugin
 	{
 		public override string Author
@@ -191,7 +191,7 @@ namespace BuildMode
 		}
 		void OnSendBytes(SendBytesEventArgs e)
 		{
-			bool build = Build[e.Socket.whoAmI];
+			bool build = Build[e.Socket.Id];
 			switch (e.Buffer[2])
 			{
 				case 7:
