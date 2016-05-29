@@ -16,7 +16,6 @@ namespace BuildMode
 		{
 			get { return "MarioE"; }
 		}
-		bool[] Build = new bool[256];
 		public override string Description
 		{
 			get { return "Adds a building command."; }
@@ -45,7 +44,7 @@ namespace BuildMode
 
 				ServerApi.Hooks.NetGetData.Deregister(this, OnGetData);
 				ServerApi.Hooks.NetSendBytes.Deregister(this, OnSendBytes);
-				ServerApi.Hooks.ServerLeave.Deregister(this, OnLeave);
+                ServerApi.Hooks.NetGreetPlayer.Deregister(this, onGreet);
 			}
 		}
 		public override void Initialize()
@@ -55,17 +54,27 @@ namespace BuildMode
 
 			ServerApi.Hooks.NetGetData.Register(this, OnGetData);
 			ServerApi.Hooks.NetSendBytes.Register(this, OnSendBytes);
-			ServerApi.Hooks.ServerLeave.Register(this, OnLeave);
+            ServerApi.Hooks.NetGreetPlayer.Register(this, onGreet);
 
 			Timer.Elapsed += OnElapsed;
 			Timer.Start();
 		}
 
+        void onGreet(GreetPlayerEventArgs args)
+        {
+            var plr = TShock.Players[args.Who];
+
+            if (plr == null || !plr.Active)
+                return;
+
+            plr.SetData<bool>("buildmode", false);
+        }
+
 		void OnElapsed(object sender, ElapsedEventArgs e)
 		{
-			for (int i = 0; i < Build.Length; i++)
+			for (int i = 0; i < TShock.Players.Length; i++)
 			{
-				if (Build[i])
+				if (TShock.Players[i].GetData<bool>("buildmode"))
 				{
 					Player plr = Main.player[i];
 					TSPlayer tsplr = TShock.Players[i];
@@ -73,7 +82,7 @@ namespace BuildMode
                     if (plr.hostile)
                     {
                         tsplr.SendErrorMessage("You cannot use Buildmode when PvP is active!");
-                        Build[i] = false;
+                        TShock.Players[i].SetData<bool>("buildmode", false);
                         return;
                     }
 
@@ -95,7 +104,7 @@ namespace BuildMode
 		}
 		void OnGetData(GetDataEventArgs e)
 		{
-			if (!e.Handled && Build[e.Msg.whoAmI])
+			if (!e.Handled && TShock.Players[e.Msg.whoAmI].GetData<bool>("buildmode"))
 			{
 				Player plr = Main.player[e.Msg.whoAmI];
 				TSPlayer tsplr = TShock.Players[e.Msg.whoAmI];
@@ -185,13 +194,9 @@ namespace BuildMode
 				}
 			}
 		}
-		void OnLeave(LeaveEventArgs e)
-		{
-			Build[e.Who] = false;
-		}
 		void OnSendBytes(SendBytesEventArgs e)
 		{
-			bool build = Build[e.Socket.Id];
+			bool build = TShock.Players[e.Socket.Id].GetData<bool>("buildmode");
 			switch (e.Buffer[2])
 			{
 				case 7:
@@ -248,8 +253,9 @@ namespace BuildMode
                 return;
             }
 
-			Build[e.Player.Index] = !Build[e.Player.Index];
-			e.Player.SendSuccessMessage((Build[e.Player.Index] ? "En" : "Dis") + "abled build mode.");
+            e.Player.SetData<bool>("buildmode", e.Player.GetData<bool>("buildmode"));
+
+			e.Player.SendSuccessMessage((e.Player.GetData<bool>("buildmode") ? "En" : "Dis") + "abled build mode.");
 			// Time
 			NetMessage.SendData(7, e.Player.Index);
 			// NPCs
@@ -281,7 +287,7 @@ namespace BuildMode
             }
             else
             {
-                if (Build[ply[0].Index])
+                if (ply[0].GetData<bool>("buildmode"))
                 {
                     args.Player.SendInfoMessage(ply[0].Name + " has Buildmode enabled!");
                 }
