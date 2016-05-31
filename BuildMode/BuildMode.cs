@@ -9,7 +9,7 @@ using TShockAPI;
 
 namespace BuildMode
 {
-	[ApiVersion(1, 23)]
+	[ApiVersion(1, 24)]
 	public class BuildMode : TerrariaPlugin
 	{
 		public override string Author
