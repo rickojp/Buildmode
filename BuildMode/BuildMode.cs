@@ -253,7 +253,7 @@ namespace BuildMode
                 return;
             }
 
-            e.Player.SetData<bool>("buildmode", e.Player.GetData<bool>("buildmode"));
+            e.Player.SetData<bool>("buildmode", !e.Player.GetData<bool>("buildmode"));
 
 			e.Player.SendSuccessMessage((e.Player.GetData<bool>("buildmode") ? "En" : "Dis") + "abled build mode.");
 			// Time
