@@ -74,6 +74,9 @@ namespace BuildMode
 		{
 			for (int i = 0; i < TShock.Players.Length; i++)
 			{
+				if (TShock.Players[i] == null || !TShock.Players[i].Active || !TShock.Players[i].IsLoggedIn)
+					continue;
+
 				if (TShock.Players[i].GetData<bool>("buildmode"))
 				{
 					Player plr = Main.player[i];
