@@ -9,7 +9,7 @@ using TShockAPI;
 
 namespace BuildMode
 {
-	[ApiVersion(1, 25)]
+	[ApiVersion(1, 26)]
 	public class BuildMode : TerrariaPlugin
 	{
 		public override string Author
@@ -44,7 +44,7 @@ namespace BuildMode
 
 				ServerApi.Hooks.NetGetData.Deregister(this, OnGetData);
 				ServerApi.Hooks.NetSendBytes.Deregister(this, OnSendBytes);
-                ServerApi.Hooks.NetGreetPlayer.Deregister(this, onGreet);
+                ServerApi.Hooks.NetGreetPlayer.Deregister(this, OnGreet);
 			}
 		}
 		public override void Initialize()
@@ -54,20 +54,20 @@ namespace BuildMode
 
 			ServerApi.Hooks.NetGetData.Register(this, OnGetData);
 			ServerApi.Hooks.NetSendBytes.Register(this, OnSendBytes);
-            ServerApi.Hooks.NetGreetPlayer.Register(this, onGreet);
+            ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreet);
 
 			Timer.Elapsed += OnElapsed;
 			Timer.Start();
 		}
 
-        void onGreet(GreetPlayerEventArgs args)
+        void OnGreet(GreetPlayerEventArgs args)
         {
             var plr = TShock.Players[args.Who];
 
             if (plr == null || !plr.Active)
                 return;
 
-            plr.SetData<bool>("buildmode", false);
+            plr.SetData("buildmode", false);
         }
 
 		void OnElapsed(object sender, ElapsedEventArgs e)
