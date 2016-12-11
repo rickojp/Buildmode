@@ -199,7 +199,7 @@ namespace BuildMode
 		}
 		void OnSendBytes(SendBytesEventArgs e)
 		{
-			bool build = TShock.Players[e.Socket.Id].GetData<bool>("buildmode");
+            bool build = TShock.Players[e.Socket.Id].GetData<bool>("buildmode");
 			switch (e.Buffer[2])
 			{
 				case 7:
@@ -218,6 +218,7 @@ namespace BuildMode
 
 						writer.BaseStream.Position += 4;
 						writer.Write(Main.worldName);
+                        writer.Write(Main.ActiveWorldFileData.UniqueId.ToString());
 
 						writer.BaseStream.Position += 49;
 						writer.Write(build ? 0f : Main.maxRaining);
