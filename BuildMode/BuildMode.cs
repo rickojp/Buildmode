@@ -9,7 +9,7 @@ using TShockAPI;
 
 namespace BuildMode
 {
-	[ApiVersion(1, 26)]
+	[ApiVersion(2, 0)]
 	public class BuildMode : TerrariaPlugin
 	{
 		public override string Author
@@ -44,31 +44,31 @@ namespace BuildMode
 
 				ServerApi.Hooks.NetGetData.Deregister(this, OnGetData);
 				ServerApi.Hooks.NetSendBytes.Deregister(this, OnSendBytes);
-                ServerApi.Hooks.NetGreetPlayer.Deregister(this, OnGreet);
+				ServerApi.Hooks.NetGreetPlayer.Deregister(this, OnGreet);
 			}
 		}
 		public override void Initialize()
 		{
 			Commands.ChatCommands.Add(new Command("buildmode.use", BuildModeCmd, "buildmode"));
-            Commands.ChatCommands.Add(new Command("buildmode.check", BMCheck, "bmcheck"));
+			Commands.ChatCommands.Add(new Command("buildmode.check", BMCheck, "bmcheck"));
 
 			ServerApi.Hooks.NetGetData.Register(this, OnGetData);
 			ServerApi.Hooks.NetSendBytes.Register(this, OnSendBytes);
-            ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreet);
+			ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreet);
 
 			Timer.Elapsed += OnElapsed;
 			Timer.Start();
 		}
 
-        void OnGreet(GreetPlayerEventArgs args)
-        {
-            var plr = TShock.Players[args.Who];
+		void OnGreet(GreetPlayerEventArgs args)
+		{
+			var plr = TShock.Players[args.Who];
 
-            if (plr == null || !plr.Active)
-                return;
+			if (plr == null || !plr.Active)
+				return;
 
-            plr.SetData("buildmode", false);
-        }
+			plr.SetData("buildmode", false);
+		}
 
 		void OnElapsed(object sender, ElapsedEventArgs e)
 		{
@@ -82,12 +82,12 @@ namespace BuildMode
 					Player plr = Main.player[i];
 					TSPlayer tsplr = TShock.Players[i];
 
-                    if (plr.hostile)
-                    {
-                        tsplr.SendErrorMessage("You cannot use Buildmode when PvP is active!");
-                        TShock.Players[i].SetData<bool>("buildmode", false);
-                        return;
-                    }
+					if (plr.hostile)
+					{
+						tsplr.SendErrorMessage("You cannot use Buildmode when PvP is active!");
+						TShock.Players[i].SetData("buildmode", false);
+						return;
+					}
 
 					NetMessage.SendData(7, i);
 					if (plr.statLife < plr.statLifeMax && !plr.dead)
@@ -137,7 +137,7 @@ namespace BuildMode
 						{
 							int count = 0;
 							int type = e.Msg.readBuffer[e.Index + 8];
-							
+
 							Item lastItem = null;
 							foreach (Item i in plr.inventory)
 							{
@@ -199,7 +199,10 @@ namespace BuildMode
 		}
 		void OnSendBytes(SendBytesEventArgs e)
 		{
-            bool build = TShock.Players[e.Socket.Id].GetData<bool>("buildmode");
+			if (TShock.Players[e.Socket.Id] == null)
+				return;
+
+			bool build = TShock.Players[e.Socket.Id].GetData<bool>("buildmode");
 			switch (e.Buffer[2])
 			{
 				case 7:
@@ -218,7 +221,7 @@ namespace BuildMode
 
 						writer.BaseStream.Position += 4;
 						writer.Write(Main.worldName);
-                        writer.Write(Main.ActiveWorldFileData.UniqueId.ToString());
+						writer.Write(Main.ActiveWorldFileData.UniqueId.ToString());
 
 						writer.BaseStream.Position += 49;
 						writer.Write(build ? 0f : Main.maxRaining);
@@ -248,16 +251,16 @@ namespace BuildMode
 					break;
 			}
 		}
-		
+
 		void BuildModeCmd(CommandArgs e)
 		{
-            if (e.TPlayer.hostile)
-            {
-                e.Player.SendErrorMessage("You cannot enable Buildmode with PvP active!");
-                return;
-            }
+			if (e.TPlayer.hostile)
+			{
+				e.Player.SendErrorMessage("You cannot enable Buildmode with PvP active!");
+				return;
+			}
 
-            e.Player.SetData<bool>("buildmode", !e.Player.GetData<bool>("buildmode"));
+			e.Player.SetData<bool>("buildmode", !e.Player.GetData<bool>("buildmode"));
 
 			e.Player.SendSuccessMessage((e.Player.GetData<bool>("buildmode") ? "En" : "Dis") + "abled build mode.");
 			// Time
@@ -276,28 +279,28 @@ namespace BuildMode
 			}
 		}
 
-        void BMCheck(CommandArgs args)
-        {
-            var plStr = String.Join(" ", args.Parameters);
+		void BMCheck(CommandArgs args)
+		{
+			var plStr = String.Join(" ", args.Parameters);
 
-            var ply = TShock.Utils.FindPlayer(plStr);
-            if (ply.Count < 1)
-            {
-                args.Player.SendErrorMessage("No players matched that name!");
-            }
-            else if (ply.Count > 1)
-            {
-                TShock.Utils.SendMultipleMatchError(args.Player, ply.Select(p => p.Name));
-            }
-            else
-            {
-                if (ply[0].GetData<bool>("buildmode"))
-                {
-                    args.Player.SendInfoMessage(ply[0].Name + " has Buildmode enabled!");
-                }
-                else
-                    args.Player.SendInfoMessage(ply[0].Name + " does not have Buildmode enabled.");
-            }
-        }
+			var ply = TShock.Utils.FindPlayer(plStr);
+			if (ply.Count < 1)
+			{
+				args.Player.SendErrorMessage("No players matched that name!");
+			}
+			else if (ply.Count > 1)
+			{
+				TShock.Utils.SendMultipleMatchError(args.Player, ply.Select(p => p.Name));
+			}
+			else
+			{
+				if (ply[0].GetData<bool>("buildmode"))
+				{
+					args.Player.SendInfoMessage(ply[0].Name + " has Buildmode enabled!");
+				}
+				else
+					args.Player.SendInfoMessage(ply[0].Name + " does not have Buildmode enabled.");
+			}
+		}
 	}
 }
