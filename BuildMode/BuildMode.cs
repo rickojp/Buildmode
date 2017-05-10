@@ -9,7 +9,7 @@ using TShockAPI;
 
 namespace BuildMode
 {
-	[ApiVersion(2, 0)]
+	[ApiVersion(2, 1)]
 	public class BuildMode : TerrariaPlugin
 	{
 		public override string Author
@@ -148,7 +148,7 @@ namespace BuildMode
 								}
 							}
 							if (count <= 5 && lastItem != null)
-								tsplr.GiveItem(lastItem.type, lastItem.name, plr.width, plr.height, lastItem.maxStack + 1 - count);
+								tsplr.GiveItem(lastItem.type, lastItem.Name, plr.width, plr.height, lastItem.maxStack + 1 - count);
 						}
 						break;
 					case PacketTypes.Tile:
@@ -170,7 +170,7 @@ namespace BuildMode
 									}
 								}
 								if (count <= 5 && lastItem != null)
-									tsplr.GiveItem(lastItem.type, lastItem.name, plr.width, plr.height, lastItem.maxStack + 1 - count);
+									tsplr.GiveItem(lastItem.type, lastItem.Name, plr.width, plr.height, lastItem.maxStack + 1 - count);
 							}
 							else if (type == 5 || type == 10 || type == 12)
 							{
@@ -221,7 +221,7 @@ namespace BuildMode
 
 						writer.BaseStream.Position += 4;
 						writer.Write(Main.worldName);
-						writer.Write(Main.ActiveWorldFileData.UniqueId.ToString());
+						writer.Write(Main.ActiveWorldFileData.UniqueId.ToByteArray());
 
 						writer.BaseStream.Position += 49;
 						writer.Write(build ? 0f : Main.maxRaining);
